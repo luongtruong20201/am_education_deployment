@@ -30,8 +30,8 @@ services:
     env_file:
       - ./am_education/.env.example
     volumes:
-      - ./public_key.pem:/app/public_key.pem
-      - ./private_key.pem:/app/private_key.pem
+      - ./public.pem:/app/public.pem
+      - ./private.pem:/app/private.pem
     networks:
       - am_education
 
