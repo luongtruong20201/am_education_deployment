@@ -9,7 +9,7 @@ services:
     image: mysql:8.4
     container_name: mysql
     ports:
-      - "3307:3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: mysql
       MYSQL_DATABASE: am_education
@@ -28,12 +28,27 @@ services:
       - mysql
       - redis
     env_file:
-      - ./am_education/.env.example
+      - ./am_education_be/.env.example
+    ports:
+      - "8080:8080"
     volumes:
       - ./public.pem:/app/public.pem
       - ./private.pem:/app/private.pem
     networks:
       - am_education
+
+  am_education_fe:
+    image: nghia130302/am_education_fe:develop
+    container_name: am_education_fe
+    restart: always
+    depends_on:
+      - am_education_be
+    ports:
+      - "3000:5173"
+    networks:
+      - am_education
+    env_file:
+      - ./am_education_fe/.env.example
 
   nginx:
     image: nginx:alpine
