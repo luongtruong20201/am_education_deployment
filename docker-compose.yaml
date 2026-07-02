@@ -1,15 +1,17 @@
 services:
   redis:
     image: redis:alpine
-    container_name: redis
+    container_name: am_education_redis
     networks:
       - am_education
+    volumes:
+      - redis_data:/data
 
   mysql:
     image: mysql:8.4
-    container_name: mysql
+    container_name: am_education_mysql
     ports:
-      - "3306:3306"
+      - "3306:3307"
     environment:
       MYSQL_ROOT_PASSWORD: mysql
       MYSQL_DATABASE: am_education
@@ -52,7 +54,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: nginx
+    container_name: am_education_nginx
     restart: always
     ports:
       - "80:80"
@@ -63,6 +65,8 @@ services:
 
 volumes:
   mysql_data:
+  redis_data:
+  
 
 networks:
   am_education:
