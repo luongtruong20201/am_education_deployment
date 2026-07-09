@@ -2,16 +2,18 @@ services:
   redis:
     image: redis:alpine
     container_name: am_education_redis
+    restart: unless-stopped
     networks:
       - am_education
     volumes:
       - redis_data:/data
+    expose:
+      - "6379"
 
   mysql:
     image: mysql:8.4
     container_name: am_education_mysql
-    ports:
-      - "3307:3306"
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: mysql
       MYSQL_DATABASE: am_education
@@ -21,52 +23,54 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - am_education
+    expose:
+      - "3306"
 
   am_education_be:
     image: luongtruong20201/am_education_api:develop
     container_name: am_education_be
-    restart: always
+    restart: unless-stopped
     depends_on:
       - mysql
       - redis
     env_file:
       - ./am_education_be/.env.example
-    ports:
-      - "8080:8080"
     volumes:
-      - ./public.pem:/app/public.pem
-      - ./private.pem:/app/private.pem
+      - ./public.pem:/app/public.pem:ro
+      - ./private.pem:/app/private.pem:ro
+    expose:
+      - "8080"
     networks:
       - am_education
 
   am_education_fe:
     image: nghia130302/am_education_fe:develop
     container_name: am_education_fe
-    restart: always
+    restart: unless-stopped
     depends_on:
       - am_education_be
-    ports:
-      - "3000:5173"
+    expose:
+      - "80"
     networks:
       - am_education
-    env_file:
-      - ./am_education_fe/.env.example
 
   nginx:
     image: nginx:alpine
     container_name: am_education_nginx
-    restart: always
+    restart: unless-stopped
+    depends_on:
+      - am_education_fe
+      - am_education_be
     ports:
       - "81:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - am_education
 
 volumes:
   mysql_data:
   redis_data:
-  
 
 networks:
   am_education:
