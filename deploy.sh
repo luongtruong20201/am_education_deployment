@@ -5,8 +5,8 @@ IFS=$'\n\t'
 echo "===> [1/5] Pulling latest code from GitHub..."
 git pull
 
-echo "===> [2/5] Starting database and cache (MySQL & Redis)..."
-docker compose up -d mysql redis
+echo "===> [2/5] Starting database, cache and storage (MySQL, Redis & MinIO)..."
+docker compose up -d mysql redis minio
 
 echo "===> [3/5] Checking RSA security keys..."
 if [ ! -f "private.pem" ] || [ ! -f "public.pem" ]; then
