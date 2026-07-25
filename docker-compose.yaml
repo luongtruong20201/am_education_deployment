@@ -14,6 +14,8 @@ services:
     image: mysql:8.4
     container_name: am_education_mysql
     restart: unless-stopped
+    ports:
+      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: mysql
       MYSQL_DATABASE: am_education
@@ -26,20 +28,56 @@ services:
     expose:
       - "3306"
 
+  minio:
+    image: minio/minio:latest
+    container_name: am_education_minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadminpassword
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - am_education
+
   am_education_be:
     image: luongtruong20201/am_education_api:develop
     container_name: am_education_be
     restart: unless-stopped
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_started
+      redis:
+        condition: service_started
+      minio:
+        condition: service_healthy
     env_file:
       - ./am_education_be/.env.example
+    environment:
+      - USE_MINIO=true
+      - MINIO_ENDPOINT=am_education_minio:9000
+      - MINIO_PUBLIC_ENDPOINT=localhost:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadminpassword
+      - MINIO_BUCKET=ielts-audio
+      - MINIO_USE_SSL=false
+      - MINIO_PRESIGN_EXPIRY_SECONDS=3600
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
     volumes:
       - ./public.pem:/app/public.pem:ro
       - ./private.pem:/app/private.pem:ro
-    expose:
-      - "8080"
     networks:
       - am_education
 
@@ -51,6 +89,8 @@ services:
       - am_education_be
     expose:
       - "80"
+    ports:
+      - "3000:80"
     networks:
       - am_education
 
@@ -71,6 +111,7 @@ services:
 volumes:
   mysql_data:
   redis_data:
+  minio_data:
 
 networks:
   am_education:
