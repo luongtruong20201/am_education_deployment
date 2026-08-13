@@ -64,12 +64,12 @@ services:
       - ./am_education_be/.env.example
     environment:
       - USE_MINIO=true
-      - MINIO_ENDPOINT=minio:9000
-      - MINIO_PUBLIC_ENDPOINT=localhost:9000
+      - MINIO_ENDPOINT=am_education_minio:9000
+      - MINIO_PUBLIC_ENDPOINT=${MINIO_PUBLIC_ENDPOINT:-mocktest.amedu.vn}
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadminpassword
       - MINIO_BUCKET=ielts-audio
-      - MINIO_USE_SSL=false
+      - MINIO_USE_SSL=${MINIO_USE_SSL:-true}
       - MINIO_PRESIGN_EXPIRY_SECONDS=3600
     expose:
       - "8080"
