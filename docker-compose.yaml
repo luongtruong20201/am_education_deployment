@@ -51,9 +51,6 @@ services:
       - am_education
 
   am_education_be:
-    build:
-      context: ../am_education_be
-      dockerfile: Dockerfile
     image: luongtruong20201/am_education_api:develop
     container_name: am_education_be
     restart: unless-stopped
@@ -86,9 +83,6 @@ services:
       - am_education
 
   am_education_fe:
-    build:
-      context: ../am_education_fe
-      dockerfile: Dockerfile
     image: nghia130302/am_education_fe:develop
     container_name: am_education_fe
     restart: unless-stopped

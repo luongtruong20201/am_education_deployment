@@ -17,8 +17,9 @@ else
     echo "RSA keys already exist, skipping generation."
 fi
 
-echo "===> [4/5] Rebuilding and starting application containers..."
-docker compose up -d --build --force-recreate
+echo "===> [4/5] Pulling latest application images and recreating containers..."
+docker compose pull am_education_be am_education_fe nginx
+docker compose up -d --force-recreate am_education_be am_education_fe nginx
 
 echo "===> [5/5] Cleaning up unused Docker images..."
 docker image prune -f
