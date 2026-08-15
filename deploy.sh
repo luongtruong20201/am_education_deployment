@@ -21,7 +21,11 @@ echo "===> [4/5] Pulling latest application images and recreating containers..."
 docker compose pull am_education_be am_education_fe nginx
 docker compose up -d --force-recreate am_education_be am_education_fe nginx
 
-echo "===> [5/5] Cleaning up unused Docker images..."
+echo "===> [5/5] Ensuring MinIO media bucket public download policy..."
+docker exec -i am_education_minio mc alias set myminio http://localhost:9000 minioadmin minioadminpassword 2>/dev/null || true
+docker exec -i am_education_minio mc anonymous set download myminio/ielts-audio 2>/dev/null || true
+
+echo "===> [6/6] Cleaning up unused Docker images..."
 docker image prune -f
 
 echo "=========================================="
